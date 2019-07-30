@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jorchi.elevator.dao.CodeDao">
+
+    <select id="selectCoordinate" resultType="com.jorchi.elevator.vos.vo.CodeVO">
+     select COUNT(uc.PARENTID) num,ucc.id,ucc.gpsx lng,ucc.gpsy lat from u_code  uc INNER JOIN u_code ucc ON uc.PARENTID=ucc.id
+     where uc.SSTATE!=2 and uc.SLEVEL=2 and ucc.SSTATE!=2 and ucc.SLEVEL=1  GROUP BY uc.PARENTID
+
+    </select>
+
+    <select id="selectAmount" resultType="com.jorchi.elevator.vos.vo.AmountVO">
+        SELECT * FROM (SELECT COUNT(*) elevatorCount FROM u_code where SSTATE!=2 and SLEVEL=2) AS C ,(SELECT COUNT(*) insureCount FROM u_code where SSTATE!=2 and SLEVEL=2) AS g,(SELECT  count( DISTINCT elevatorbrand)elevatorBrand FROM u_code_elevator where sstate!=2) AS d
+      ,(SELECT COUNT(*)propertyUnit from sys_org where longcode like '1;3;%' and sstate !=2) AS e,(SELECT COUNT(*)maintenanceUnit from sys_org where longcode like '1;2;%' and sstate !=2) AS f
+    </select>
+
+    <select id="selectToday" resultType="com.jorchi.elevator.vos.vo.TodayVO">
+        select * from (SELECT COUNT(*)maintenanceUpload from u_list where STYPE=1 and TO_DAYS(PHOTOTIME)=TO_DAYS(NOW())) AS aa,
+
+(SELECT COUNT(*)checked from u_list where CHECKSTATUS=2 and TO_DAYS(audit_time)=TO_DAYS(NOW())) AS bb,
+
+(SELECT COUNT(*)qualityInspection from e_check_info where  dtime is NULL and YEARWEEK(date_format(uploadtime,'%Y-%m-%d')) = YEARWEEK( now() ))AS cc,
+
+(SELECT COUNT(*)patrolAnomaly from e_checkitem_info ec INNER JOIN e_check_info ei ON ec.check_info_id=ei.id where ec.status=0 and YEARWEEK(date_format(ei.uploadtime,'%Y-%m-%d')) = YEARWEEK( now() ))AS dd
+    </select>
+    <select id="selectHouse" resultType="com.jorchi.elevator.vos.vo.HouseVO">
+SELECT ud.sname pointName,udd.sname areaName,ul.jg_time haoshi,ul.PHOTOTIME endTime,checkstatus isCheck,checktime uploadTime from u_list ul  INNER JOIN u_code ud ON ul.CODEID=ud.id INNER JOIN u_code udd ON ud.parentid=udd.id
+where ul.stype=1 and ud.SSTATE!=2 and ud.SLEVEL=2 and TO_DAYS(ul.PHOTOTIME)=TO_DAYS(NOW())
+    </select>
+
+    <select id="selectInspect" resultType="com.jorchi.elevator.vos.vo.InspectVO">
+SELECT eh.id,eh.UPLOADTIME checkTime,eh.STATUS isOk,ud.sname areaName FROM e_check_info eh INNER JOIN u_code ud ON eh.e_id=ud.id
+ where eh.dtime is NULL and ud.SSTATE!=2 and ud.SLEVEL=2 AND TO_DAYS(UPLOADTIME)=TO_DAYS(NOW())
+    </select>
+    <select id="countNum" resultType="integer">
+ SELECT COUNT(*) FROM e_checkitem_info where check_info_id=#{id}
+    </select>
+
+    <select id="array" resultType="com.jorchi.elevator.vos.vo.ArrayVO">
+        SELECT * FROM (SELECT COUNT(*) num FROM u_code WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( SCREATETIME, '%Y%m' ) ) =1) AS a,(SELECT COUNT(*)num1 FROM u_code WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( SCREATETIME, '%Y%m' ) ) =2) AS b,
+(SELECT COUNT(*)num2 FROM u_code WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( SCREATETIME, '%Y%m' ) ) =3) AS c
+
+    </select>
+    <select id="thread" resultType="integer">
+     SELECT jg_time FROM u_list WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( PHOTOTIME, '%Y%m' ) ) =3
+    </select>
+    <select id="thread1" resultType="integer">
+     SELECT jg_time FROM u_list WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( PHOTOTIME, '%Y%m' ) ) =2
+    </select>
+    <select id="thread2" resultType="integer">
+     SELECT jg_time FROM u_list WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( PHOTOTIME, '%Y%m' ) ) =1
+    </select>
+
+</mapper>
