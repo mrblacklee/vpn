@@ -88,6 +88,8 @@
 	</dependencies>
 
 	<build>
+		<defaultGoal>compile</defaultGoal>
+		<finalName>demo_1SpringBoot</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -129,7 +131,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<defaultGoal>compile</defaultGoal>
 	</build>
 
 </project>
