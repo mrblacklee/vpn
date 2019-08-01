@@ -88,7 +88,7 @@
 	</dependencies>
 
 	<build>
-		<defaultGoal>compile</defaultGoal>
+		<!--<defaultGoal>compile</defaultGoal>-->
 		<finalName>demo_1SpringBoot</finalName>
 		<plugins>
 			<plugin>
